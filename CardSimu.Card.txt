@@ -1,0 +1,87 @@
+EXPORT cardTypeList,cardIndexList;
+EXPORT randCard(n)
+BEGIN
+ cardTypeList:={};
+ cardIndexList:={};
+ LOCAL cardType,cardIndex,rnd,i,k,j,tmp;
+  FOR i FROM 1 TO n DO
+  times:=times+1;
+  timeSum:=timeSum+1;
+  rnd:=RANDOM();
+  IF rnd≥0 AND rnd<prob5+prob5Add THEN
+   prob4Add:=0;
+   time4:=0;
+   last5:=times;
+   times5:=times5+1;
+   avg5:=(avg5*(times5-1)+last5)/times5;
+   IF time4==9 THEN
+    next4Flag:=1;
+   END;
+   rnd:=RANDOM();
+   IF rnd≥0 AND rnd<0.5 THEN
+    sum5W:=sum5W+1;
+    cardType:=4;
+   ELSE
+    sum5C:=sum5C+1;
+    cardType:=5;
+   END;
+   prob5Add:=0;
+   times:=0;
+  ELSE
+   IF (rnd≥prob5+prob5Add AND
+   rnd<prob5+prob4+prob4Add+prob5Add) OR
+   time4==9 OR next4Flag THEN
+    IF NOT(rnd≥prob5+prob5Add AND
+    rnd<prob5+prob4+prob4Add+prob5Add OR
+    time4==9) THEN
+     next4Flag:=0;
+    END; 
+    prob4Add:=0;
+    time4:=0;
+    rnd:=RANDOM();
+    IF rnd≥0 AND rnd<0.5 THEN
+     sum4W:=sum4W+1;
+     cardType:=2;
+    ELSE
+     sum4C:=sum4C+1;
+     cardType:=3;
+    END;
+   ELSE
+    sum3:=sum3+1;
+    time4:=time4+1;
+    cardType:=1;
+   END;
+  END;
+
+  IF time4==8 THEN
+   prob4Add:=0.5-prob4;
+  END;
+  IF times≥74 THEN
+   prob5Add:=prob5Add+0.062125;
+  END;
+  cardIndex:=
+    INT(RANDOM(1,SIZE(cardPool(cardType))+1));
+  cardTypeList:=
+   CONCAT(cardType,cardTypeList);
+  cardIndexList:=
+   CONCAT(cardIndex,cardIndexList);
+ END;
+ FOR i FROM 1 TO n DO
+  k:=i;
+  FOR j FROM i+1 TO n DO
+   IF cardTypeList(j)>cardTypeList(k)
+   OR (cardTypeList(j)==cardTypeList(k)
+    AND cardIndexList(j)>cardIndexList(k))THEN
+    k:=j;
+   END;
+  END;
+  IF k≠i THEN
+   tmp:=cardIndexList(i);
+   cardIndexList(i):=cardIndexList(k);
+   cardIndexList(k):=tmp;
+   tmp:=cardTypeList(i);
+   cardTypeList(i):=cardTypeList(k);
+   cardTypeList(k):=tmp;
+  END;
+ END;
+END;

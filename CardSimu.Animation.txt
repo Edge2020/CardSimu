@@ -1,0 +1,82 @@
+EXPORT predrawAnimation()
+BEGIN
+ DIMGROB_P(G2,63,118,3);
+ LOCAL j,i;
+
+ FOR i FROM 0 TO 2 DO
+  FOR j FROM 5 TO 10 DO
+   ARC_P(G2,10+i*21,10,j,(j)MOD 3);
+   ARC_P(G2,10+i*21,107,j,(j)MOD 3);
+  END;
+  RECT_P(G2,i*21,8,20+i*21,109,
+   IFTE(i==2,0,2),i);
+ END;
+ FOR j FROM 8 TO 109 STEP 3 DO
+  LINE_P(G2,0,j,20,j,2);
+ END;
+END;
+
+EXPORT dispAnimation(n)
+BEGIN
+ DIMGROB_P(G1,256,127,3);
+ LOCAL i,y,yV,calcTime,yG,color,type,tmpList;
+ LOCAL j,t,text,tY,brkFlag;
+
+ FOR i FROM 0 TO n-1 DO
+  IF n≠1 THEN
+   setPrgBarVal((i+1)*10);
+  END;
+
+  type:=cardTypeList(i+1);
+
+  IF type==4 OR type==5 THEN
+   color:=0;
+  ELSE
+   IF type==2 OR type==3 THEN
+    color:=1;
+   ELSE
+    color:=2;
+   END;
+  END;
+
+  BLIT_P(G1,5+i*25,5,
+   G2,21*color,0,21*(color+1),118);
+  tmpList:=cardPool(type);
+  text:=tmpList(cardIndexList(i+1));
+  tY:=(5-dim(text)/2)*12;
+  dispText(G1,text,
+   10+i*25,tY,IFTE(color==2,0,3));
+ END;
+ prgVal:=0;
+
+ yG:=−384;
+ calcTime:=0.01;
+
+ IF n≥10 THEN
+  RECT_P();
+ END;
+
+ brkFlag:=0;
+ REPEAT UNTIL GETKEY()==−1;
+ FOR i FROM 0 TO n-1 DO
+  y:=−8;
+  yV:=140;
+  REPEAT
+   IF GETKEY()==5 THEN
+    BLIT_P(G0,G1);
+    brkFlag:=1;
+    BREAK;
+   END;
+   t:=Time+30;
+   yV:=yV+calcTime*yG;
+   y:=y+calcTime*yV;
+   BLIT_P(G0,
+    4+i*25,y,
+    27+i*25,y+127,
+    G1,4+i*25,0,27+i*25,127);
+   WHILE Time<t DO END;
+  UNTIL y≥0;
+  IF brkFlag THEN BREAK; END;
+ END;
+ DIMGROB_P(G1,0,0);
+END;

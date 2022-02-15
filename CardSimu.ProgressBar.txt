@@ -1,0 +1,33 @@
+EXPORT prgX,prgY,prgVal;
+
+EXPORT prgLoad()
+BEGIN
+ LOCAL x,y,str;
+ prgX:=64;
+ prgY:=54;
+ prgVal:=0;
+ DIMGROB_P(G4,126,14,3);
+ DIMGROB_P(G3,126,14,3);
+ FOR y FROM 0 TO 13 DO
+  str:=prgDat(y+1);
+  FOR x FROM 0 TO 125 DO
+   IF mid(str,x+1,1)=="0" THEN
+    PIXON_P(G4,x,y,2);
+    PIXON_P(G3,x,y,0);
+   END;
+  END;
+ END;
+END;
+
+EXPORT dispPrgBar()
+BEGIN
+ BLIT_P(G0,prgX,prgY,G4);
+END;
+
+EXPORT setPrgBarVal(value)
+BEGIN
+ BLIT_P(G0,prgX+prgVal*1.26,prgY,
+  prgX+value*1.26,prgY+14,
+  G3,prgVal*1.26,0,value*1.26,14);
+ prgVal:=value;
+END;

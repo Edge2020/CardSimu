@@ -1,0 +1,96 @@
+EXPORT CardSimu()
+BEGIN
+RECT_P(96,48,160,66,0,1);
+TEXTOUT_P("少女祈祷中",99,52,1,3);
+LOCAL exitFlag,key,sel;
+exitFlag:=0;
+key:=−1;
+predrawAnimation();
+prgLoad();
+redrawMain();
+REPEAT
+ REPEAT key:=WAIT(); UNTIL key≠−1;
+ IF key==0 THEN
+  IF question("退出程序?") THEN
+   exitFlag:=1;
+  END;
+ END;
+ IF key==4 OR key==5 THEN
+  IF question("抽卡?") THEN
+   RECT_P();
+   IF key==5 THEN
+    dispPrgBar();
+   END;
+   randCard(IFTE(key==4,1,10));
+   dispAnimation(IFTE(key==4,1,10));
+   REPEAT UNTIL GETKEY()==−1;
+   REPEAT UNTIL WAIT()≠−1;
+   redrawMain();
+  END;
+ END;
+
+ IF key==2 THEN
+  IF question("重置?") THEN
+   reset();
+   redrawMain();
+  END;
+ END;
+
+ IF key==3 THEN
+  redrawMenu();
+  REPEAT
+   sel:=select(5,16,24,16);
+   IF sel==1 THEN
+    redrawDetail();
+    REPEAT UNTIL GETKEY()≠−1;
+    sel:=−1;
+    redrawMenu();
+   END;
+
+   IF sel==2 THEN
+    redrawCardProbSet();
+    REPEAT
+     sel:=select(3,16,24,16);
+     IF sel==1 THEN
+      INPUT(prob4,"概率设置","4★概率","");
+     END;
+     IF sel==2 THEN
+      INPUT(prob5,"概率设置","5★概率","");
+     END;
+     IF sel≠3 THEN redrawCardProbSet(); END;
+    UNTIL sel==3;
+    sel:=−1;
+    redrawMenu();
+   END;
+
+   IF sel==3 THEN
+    redrawProbSet();
+    REPEAT
+     sel:=select(6,16,24,16);
+     IF sel≠6 THEN
+      L0:=cardPool(sel);
+      EDITLIST(L0);
+      cardPool(sel):=L0;
+      L0:={};
+      redrawProbSet();
+     END;
+    UNTIL sel==6;
+    sel:=−1;
+    redrawMenu();
+   END;
+   IF sel==4 THEN
+    redrawReadme();
+    REPEAT UNTIL GETKEY()≠−1;
+    sel:=−1;
+    redrawMenu();
+   END;
+  UNTIL sel==5;
+  redrawMain();
+ END;
+
+UNTIL exitFlag;
+DIMGROB_P(G2,0,0);
+DIMGROB_P(G2,0,0);
+DIMGROB_P(G4,0,0);
+RETURN(0);
+END;
